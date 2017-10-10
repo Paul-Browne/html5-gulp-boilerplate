@@ -103,9 +103,11 @@ gulp.task('minify-uglify-optimize', function() {
     })))
     .pipe(gulpIf('*.js', uglify()))
     .pipe(gulpIf('*.css', cssnano()))
-    .pipe(gulpIf('*.+(png|jpg|jpeg|gif|svg)', cache(imagemin({
-        interlaced: true,
-    }))))
+    .pipe(gulpIf('*.+(png|jpg|jpeg|gif|svg)', cache(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5})
+    ]))))
     .pipe(gulp.dest('dist'))
 })
 
