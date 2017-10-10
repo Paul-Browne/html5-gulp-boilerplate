@@ -28,6 +28,8 @@ This is a bit more than a html5 and gulp boilerplate, it also includes setup for
 #### prettify contents in the /src directory
 `gulp prettify`
 
+#### delete the /dist directory
+`gulp clean`
 
 #### to use https://localhost
 
