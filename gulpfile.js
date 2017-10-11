@@ -1,11 +1,13 @@
 var gulp         = require('gulp');
 var gulpIf       = require('gulp-if');
-var useref       = require('gulp-useref');
 var cssnano      = require('gulp-cssnano');
 var uglify       = require('gulp-uglify');
 var htmlmin      = require('gulp-htmlmin');
-var imagemin     = require('gulp-imagemin');
-var cache        = require('gulp-cache');
+var image        = require('gulp-image');
+var changed      = require('gulp-changed');
+var sass         = require('gulp-sass');
+var less         = require('gulp-less');
+var autoprefixer = require('gulp-autoprefixer');
 var prettify     = require('gulp-jsbeautifier');
 var fs           = require('file-system');
 var runSequence  = require('run-sequence');
@@ -16,6 +18,7 @@ var express      = require('express');
 var compression  = require('compression');
 var serveStatic  = require('serve-static');
 require('dotenv').config();
+
 
 // https server with gzip and http2 (only if cert and key exist)
 
@@ -88,44 +91,85 @@ gulp.task('debug-server', function(){
     console.log("debug server http://localhost:8887");
 })
 
+// less compilation
+
+gulp.task('less', function () {
+  return gulp.src('src/less/**/*.less')
+    .pipe(changed('dist/css'))
+    .pipe(less())
+    .pipe(gulpIf('*.css', autoprefixer({
+            browsers: ['>1%'],
+            cascade: false
+    })))
+    .pipe(gulpIf('*.css', cssnano()))
+    .pipe(gulp.dest('dist/css'));
+});
+
+// sass compilation
+
+gulp.task('sass', function () {
+  return gulp.src('src/sass/**/*.scss')
+    .pipe(changed('dist/css'))
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulpIf('*.css', autoprefixer({
+            browsers: ['>1%'],
+            cascade: false
+    })))
+    .pipe(gulpIf('*.css', cssnano()))
+    .pipe(gulp.dest('dist/css'));
+});
+
+
 // minify + uglify css, js and html
 // optimize images
 // copy all to dest
 
 gulp.task('minify-uglify-optimize', function() {
-  return gulp.src('src/**/*')
-    .pipe(useref())
+  return gulp.src(['src/**/*', '!src/sass', '!src/sass/**/*', '!src/less', '!src/less/**/*'])
+    .pipe(changed('dist'))
+    .pipe(gulpIf('*.js', uglify()))
+    .pipe(gulpIf('*.css', autoprefixer({
+            browsers: ['>1%'],
+            cascade: false
+    })))
+    .pipe(gulpIf('*.css', cssnano()))
     .pipe(gulpIf('*.html', htmlmin({
       collapseWhitespace: true,
       removeComments: true,
       minifyCSS: true,
       minifyJS: true
     })))
-    .pipe(gulpIf('*.js', uglify()))
-    .pipe(gulpIf('*.css', cssnano()))
-    .pipe(gulpIf('*.+(png|jpg|jpeg|gif|svg)', cache(imagemin([
-        imagemin.gifsicle({interlaced: true}),
-        imagemin.jpegtran({progressive: true}),
-        imagemin.optipng({optimizationLevel: 5})
-    ]))))
+    .pipe(gulpIf(/.*\.(png|jpg|jpeg|gif|svg)$/, image({
+      pngquant: true,
+      optipng: false,
+      zopflipng: true,
+      jpegRecompress: false,
+      mozjpeg: true,
+      guetzli: false,
+      gifsicle: true,
+      svgo: true,
+      concurrent: 10
+    })))
+    //.pipe(gulpIf(/.*\.(js|css|html|png|jpg|jpeg|gif|svg)$/, gulp.dest('dist')))
     .pipe(gulp.dest('dist'))
 })
 
 // Cleaning
 
-gulp.task('clean', function() {
+gulp.task('clean:all', function() {
   return del.sync('dist');
 })
 
-gulp.task('clean:dist', function() {
-  return del.sync(['dist/**/*', '!dist/assets/images', '!dist/assets/images/**/*']);
+gulp.task('clean:code', function() {
+  return del.sync(['dist/**/*', '!dist/images', '!dist/images/**/*']);
 });
 
 // Build
 
 gulp.task('build', function(callback) {
   runSequence(
-    'clean:dist',
+    'less',
+    'sass',
     'minify-uglify-optimize',
     callback
   )
@@ -134,7 +178,7 @@ gulp.task('build', function(callback) {
 // Watch
 
 gulp.task('watch', function() {
-    gulp.watch('src/**/*.+(html|css|js)', ['build']);
+    gulp.watch('src/**/*', ['build']);
 })
 
 
