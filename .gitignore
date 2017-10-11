@@ -59,3 +59,4 @@ typings/
 
 /dev
 /dist
+.DS_Store
