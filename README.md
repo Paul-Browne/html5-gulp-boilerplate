@@ -8,13 +8,14 @@ This is a bit more than a html5 and gulp boilerplate, it also includes setup for
 |gzip|:white_check_mark:|
 |https*|:white_check_mark:|
 |http2*|:white_check_mark:|
-|minifies dist html, css, js|:white_check_mark:|
-|uglifies dist js|:white_check_mark:|
-|prettifies src html, css, js|:white_check_mark:|
-|combine css, js|:white_check_mark:|
-|precompiles sass, less|coming soon|
-|autoprefixing sass|coming soon|
-|sourcemaps|coming soon|
+|html, css, js minifier|:white_check_mark:|
+|html, css, js prettifier|:white_check_mark:|
+|js uglifier|:white_check_mark:|
+|css precompilers: sass, less|:white_check_mark:|
+|html precompilers: jade|coming soon|
+|css autoprefixing: css, sass, less|:white_check_mark:|
+|css, js combiner|coming soon|
+|image optimization|:white_check_mark:|
 
 ###### https and http2 require setup of https for localhost
 

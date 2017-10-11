@@ -1,14 +1,14 @@
 .alpha {
     font-size: 24px;
-    .beta {
-        line-height: 1.5em;
+.beta {line-height: 1.5em;
         .delta {
-            color: red;
+                        color: red;
         }
     }
 }
 .example {
-    display: flex;
+                        display: flex;
+                flex-direction: column;
     transition: all .5s;
     user-select: none;
     background: linear-gradient(to bottom, white, black);
