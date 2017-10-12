@@ -18,9 +18,9 @@ var express      = require('express');
 var http         = require('http');
 var http2        = require('spdy');
 var del          = require('del');
+var opn          = require('opn');
 
 require('dotenv').config();
-
 
 // https server with gzip and http2 (only if cert and key exist)
 
@@ -67,6 +67,7 @@ gulp.task('server', function(){
                     }))
                     var disthttpsServer = http.createServer(dist);
                     disthttpsServer.listen(8888);
+                    opn('http://localhost:8888');
                     var dev = express();
                     dev.use(compression())
                     dev.use(serveStatic('./dev', {
@@ -75,6 +76,7 @@ gulp.task('server', function(){
                     }))
                     var devhttpsServer = http.createServer(dev);
                     devhttpsServer.listen(8887);
+                    opn('http://localhost:8887');
                 } else {
                     sslCrt = process.env.HOME + process.env.SSL_CRT_PATH
                     sslKey = process.env.HOME + process.env.SSL_KEY_PATH
@@ -88,8 +90,11 @@ gulp.task('server', function(){
                         'maxAge': 3600000
                     }))
                     var disthttpsServer = http2.createServer(credentials, dist);
+
                     disthttpsServer.listen(8888);
                     console.log("https://localhost:8888");
+                    opn('https://localhost:8888');
+
                     var dev = express();
                     dev.use(compression())
                     dev.use(serveStatic('./dist', {
@@ -99,6 +104,7 @@ gulp.task('server', function(){
                     var devhttpsServer = http2.createServer(credentials, dev);
                     devhttpsServer.listen(8887);
                     console.log("https://localhost:8887");
+                    opn('https://localhost:8887');
                 }
             })
         }
@@ -366,11 +372,6 @@ gulp.task('default', function(callback) {
   )
 })
 
-
-/*
-TODO refactor
-split up tasks, build:dev, build:dist, build:only (no server, no watch)
-*/
 
 /*
 CRON TASK
