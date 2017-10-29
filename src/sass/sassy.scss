@@ -2,10 +2,15 @@
     font-size: 24px;
 .beta {line-height: 1.5em;
         .delta {
-                        color: red;
+                        color: blue;
         }
     }
 }
+
+body {
+                        color: green;
+}
+
 .example {
                 display: flex;
                 flex-direction: column;

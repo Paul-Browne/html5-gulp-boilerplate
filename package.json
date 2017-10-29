@@ -4,7 +4,11 @@
   "description": "html5 gulp boilerplate",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp",
+    "clean": "gulp clean",
+    "clean-code": "gulp clean:code",
+    "pretty": "gulp pretty:src"
   },
   "repository": {
     "type": "git",
@@ -17,7 +21,6 @@
   },
   "homepage": "https://github.com/Paul-Browne/html5-gulp-boilerplate#readme",
   "devDependencies": {
-    "browser-sync": "^2.18.13",
     "compression": "^1.6.2",
     "del": "^3.0.0",
     "dotenv": "^4.0.0",
@@ -29,12 +32,14 @@
     "gulp-concat": "^2.6.1",
     "gulp-cssnano": "^2.1.2",
     "gulp-htmlmin": "^3.0.0",
-    "gulp-if": "^2.0.0",
+    "gulp-ignore": "^2.0.2",
     "gulp-image": "^4.0.0",
+    "gulp-image-resize": "^0.13.0",
     "gulp-jsbeautifier": "^2.1.1",
     "gulp-less": "^3.3.2",
     "gulp-sass": "^3.1.0",
     "gulp-uglify": "^3.0.0",
+    "image-size": "^0.6.1",
     "opn": "^5.1.0",
     "run-sequence": "^2.2.0",
     "serve-static": "^1.12.1",

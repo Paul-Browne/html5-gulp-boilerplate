@@ -1,5 +1,5 @@
-var paul =    document.getElementsByTagName('body')[0];
-                paul.addEventListener("click", function(e) {
+var test =    document.getElementsByTagName('body')[0];
+                test.addEventListener("click", function(e) {
 
 
 

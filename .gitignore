@@ -60,3 +60,4 @@ typings/
 /dev
 /dist
 .DS_Store
+/ignore

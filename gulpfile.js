@@ -1,26 +1,41 @@
 var gulp         = require('gulp');
-var gulpIf       = require('gulp-if');
 var sass         = require('gulp-sass');
 var less         = require('gulp-less');
 var image        = require('gulp-image');
 var uglify       = require('gulp-uglify');
-var concat       = require('gulp-concat');
+var gulpIgnore   = require('gulp-ignore');
 var cssnano      = require('gulp-cssnano');
 var htmlmin      = require('gulp-htmlmin');
 var changed      = require('gulp-changed');
+var imageResize  = require('gulp-image-resize');
 var autoprefixer = require('gulp-autoprefixer');
 var prettify     = require('gulp-jsbeautifier');
 var runSequence  = require('run-sequence');
 var serveStatic  = require('serve-static');
 var compression  = require('compression');
 var fs           = require('file-system');
+var sizeOf       = require('image-size');
 var express      = require('express');
 var http         = require('http');
 var http2        = require('spdy');
 var del          = require('del');
 var opn          = require('opn');
 
+
 require('dotenv').config();
+
+
+var imgPrefs = {
+    pngquant: true,
+    optipng: false,
+    zopflipng: true,
+    jpegRecompress: false,
+    mozjpeg: true,
+    guetzli: false,
+    gifsicle: false,
+    svgo: true,
+    concurrent: 10
+};
 
 // https server with gzip and http2 (only if cert and key exist)
 
@@ -93,7 +108,7 @@ gulp.task('server', function(){
 
                     disthttpsServer.listen(8888);
                     console.log("https://localhost:8888");
-                    opn('https://localhost:8888');
+                    //opn('https://localhost:8888');
 
                     var dev = express();
                     dev.use(compression())
@@ -104,252 +119,256 @@ gulp.task('server', function(){
                     var devhttpsServer = http2.createServer(credentials, dev);
                     devhttpsServer.listen(8887);
                     console.log("https://localhost:8887");
-                    opn('https://localhost:8887');
+                    //opn('https://localhost:8887');
                 }
             })
         }
     })
 })
 
-// debug server
-
-gulp.task('server:dev', function(){
-    var app = express();
-    app.use(serveStatic('./dev', {
-        'extensions': ['html'],
-        'maxAge': 3600000
-    }))
-    var httpsServer = http.createServer(app);
-    httpsServer.listen(8887);
-    console.log("dev server http://localhost:8887");
-})
-
 // less compilation + minification
 
-gulp.task('less:dev', function () {
-  return gulp.src('src/less/**/*.less')
-    .pipe(changed('dev/css'))
-    .pipe(less())
-    .pipe(gulpIf('*.css', autoprefixer({
-            browsers: ['>1%'],
-            cascade: false
-    })))
-    .pipe(gulp.dest('dev/css'))
-})
-
-gulp.task('less:dist', function () {
+gulp.task('less', function () {
   return gulp.src('src/less/**/*.less')
     .pipe(changed('dist/css'))
     .pipe(less())
-    .pipe(gulpIf('*.css', autoprefixer({
+    .pipe( autoprefixer({
             browsers: ['>1%'],
             cascade: false
-    })))
-    .pipe(gulpIf('*.css', cssnano()))
+    }))
+    .pipe(gulp.dest('dev/css'))
+    .pipe(cssnano())
     .pipe(gulp.dest('dist/css'))
 })
 
 // sass compilation + minification
 
-gulp.task('sass:dev', function () {
-  return gulp.src('src/sass/**/*.scss')
-    .pipe(changed('dev/css'))
-    .pipe(sass().on('error', sass.logError))
-    .pipe(gulpIf('*.css', autoprefixer({
-            browsers: ['>1%'],
-            cascade: false
-    })))
-    .pipe(gulp.dest('dev/css'))
-})
-
-gulp.task('sass:dist', function () {
+gulp.task('sass', function () {
   return gulp.src('src/sass/**/*.scss')
     .pipe(changed('dist/css'))
     .pipe(sass())
-    .pipe(gulpIf('*.css', autoprefixer({
+    .pipe(autoprefixer({
             browsers: ['>1%'],
             cascade: false
-    })))
-    .pipe(gulpIf('*.css', cssnano()))
+    }))
+    .pipe(gulp.dest('dev/css'))
+    .pipe(cssnano())
     .pipe(gulp.dest('dist/css'))
 })
 
 // css minification
 
-gulp.task('css:dev', function() {
-  return gulp.src('src/css/**/*.css')
-  .pipe(changed('dev/css'))
-  .pipe(gulpIf('*.css', autoprefixer({
-    browsers: ['>1%'],
-    cascade: false
-  })))
-  .pipe(gulp.dest('dev/css'))
-})
-
-gulp.task('css:dist', function() {
+gulp.task('css', function() {
   return gulp.src('src/css/**/*.css')
   .pipe(changed('dist/css'))
-  .pipe(gulpIf('*.css', autoprefixer({
+  .pipe(autoprefixer({
     browsers: ['>1%'],
     cascade: false
-  })))
-  .pipe(gulpIf('*.css', cssnano()))
+  }))
+  .pipe(gulp.dest('dev/css'))
+  .pipe(cssnano())
   .pipe(gulp.dest('dist/css'))
 })
 
 // file combining
-// TODO - needs work
+// TODO
 
-gulp.task('combine', function() {
-  return gulp.src('dist/css/**/*.css')
-  .pipe(concat('comb.css'))
-  .pipe(gulp.dest('dist/css'))
-})
+//var concat = require('gulp-concat');
+
+// gulp.task('combine', function() {
+//   return gulp.src('dist/css/**/*.css')
+//   .pipe(concat('comb.css'))
+//   .pipe(gulp.dest('dist/css'))
+// })
 
 // js minification + uglification
 
-gulp.task('js:dev', function() {
-  return gulp.src('src/js/**/*.js')
-  .pipe(changed('dev/js'))
-  .pipe(gulp.dest('dev/js'))
-})
-
-gulp.task('js:dist', function() {
+gulp.task('js', function() {
   return gulp.src('src/js/**/*.js')
   .pipe(changed('dist/js'))
-  .pipe(gulpIf('*.js', uglify()))
+  .pipe(gulp.dest('dev/js'))
+  .pipe(uglify())
   .pipe(gulp.dest('dist/js'))
 })
 
 // image optimization
 
-gulp.task('images:dev', function() {
-  return gulp.src('src/images/**/*')
-  .pipe(changed('dev/images'))
-  .pipe(gulpIf(/.*\.(png|jpg|jpeg|gif|svg)$/, image({
-    pngquant: true,
-    optipng: false,
-    zopflipng: true,
-    jpegRecompress: false,
-    mozjpeg: true,
-    guetzli: false,
-    gifsicle: true,
-    svgo: true,
-    concurrent: 10
-  })))
-  .pipe(gulp.dest('dev/images'))
-})
-
-gulp.task('images:dist', function() {
-  return gulp.src('src/images/**/*')
+gulp.task('images', function() {
+  return gulp.src('src/images/**/*.{png,jpg,jpeg,gif,svg}')
   .pipe(changed('dist/images'))
-  .pipe(gulpIf(/.*\.(png|jpg|jpeg|gif|svg)$/, image({
-    pngquant: true,
-    optipng: false,
-    zopflipng: true,
-    jpegRecompress: false,
-    mozjpeg: true,
-    guetzli: false,
-    gifsicle: true,
-    svgo: true,
-    concurrent: 10
-  })))
+  .pipe(image(imgPrefs))
   .pipe(gulp.dest('dist/images'))
+  .pipe(gulp.dest('dev/images'))
 })
 
 // html minification
 
-gulp.task('html:dev', function() {
-  return gulp.src('src/**/*.html')
-  .pipe(changed('dev'))
-  .pipe(gulp.dest('dev'))
-})
-
-gulp.task('html:dist', function() {
+gulp.task('html', function() {
   return gulp.src('src/**/*.html')
   .pipe(changed('dist'))
-  .pipe(gulpIf('*.html', htmlmin({
+  .pipe(gulp.dest('dev'))
+  .pipe(htmlmin({
     collapseWhitespace: true,
     removeComments: true,
     minifyCSS: true,
     minifyJS: true
-  })))
+  }))
   .pipe(gulp.dest('dist'))
 })
 
 // copy everything else
 
-gulp.task('other:dev', function() {
-  return gulp.src(['src/**/*.*', '!src/**/*.html', '!src/**/*.css', '!src/**/*.js', '!src/**/*.less', '!src/**/*.scss', '!src/**/*.png', '!src/**/*.jpg', '!src/**/*.jpeg', '!src/**/*.gif', '!src/**/*.svg' ])
-  .pipe(changed('dev'))
-  .pipe(gulp.dest('dev'))
-})
-
-gulp.task('other:dist', function() {
+gulp.task('other', function() {
   return gulp.src(['src/**/*.*', '!src/**/*.html', '!src/**/*.css', '!src/**/*.js', '!src/**/*.less', '!src/**/*.scss', '!src/**/*.png', '!src/**/*.jpg', '!src/**/*.jpeg', '!src/**/*.gif', '!src/**/*.svg' ])
   .pipe(changed('dist'))
+  .pipe(gulp.dest('dev'))
   .pipe(gulp.dest('dist'))
 })
+
 
 // Cleaning
 
 gulp.task('clean', function() {
-  return del.sync(['dist', 'dev']);
+  return del.sync(['dist', 'dev'])
 })
 
 gulp.task('clean:dev', function() {
-  return del.sync('dev');
+  return del.sync('dev')
 })
 
 gulp.task('clean:dist', function() {
-  return del.sync('dist');
+  return del.sync('dist')
 })
 
 gulp.task('clean:code', function() {
-  return del.sync(['dist/**/*', '!dist/images', '!dist/images/**/*', 'dev/**/*', '!dev/images', '!dev/images/**/*']);
-});
+  return del.sync(['dist/**/*', '!dist/images', '!dist/images/**/*', 'dev/**/*', '!dev/images', '!dev/images/**/*'])
+})
 
 
 // Prettify css js html
 
 gulp.task('prettify:dev', function() {
-  gulp.src('dev/**/*.+(html|css|js)')
+  return gulp.src('dev/**/*.+(html|css|js)')
     .pipe(prettify())
-    .pipe(gulp.dest('dev'));
-});
+    .pipe(gulp.dest('dev'))
+})
 
 gulp.task('prettify:src', function() {
-  gulp.src('src/**/*.+(html|css|js)')
+  return gulp.src('src/**/*.+(html|css|js)')
     .pipe(prettify())
-    .pipe(gulp.dest('src'));
-});
-// Build
+    .pipe(gulp.dest('src'))
+})
 
-gulp.task('build:dev', function(callback) {
-  console.log('dev build started...');
+
+
+
+/* TODO optimize */
+
+var lt256 = function (file) {
+    var dimensions = sizeOf(file.path);
+    if(dimensions.width > 256) {
+        return false;
+    }else{
+        return true;
+    }
+};
+var lt512 = function (file) {
+    var dimensions = sizeOf(file.path);
+    if(dimensions.width > 512) {
+        return false;
+    }else{
+        return true;
+    }
+};
+var lt1024 = function (file) {
+    var dimensions = sizeOf(file.path);
+    if(dimensions.width > 1024) {
+        return false;
+    }else{
+        return true;
+    }
+};
+var lt2048 = function (file) {
+    var dimensions = sizeOf(file.path);
+    if(dimensions.width > 2048) {
+        return false;
+    }else{
+        return true;
+    }
+};
+
+
+gulp.task('resize256', function() {
+  return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
+    .pipe(changed('dist/images/256'))
+    .pipe(gulpIgnore(lt256))
+    .pipe(imageResize({
+      width : 256
+    }))
+    .pipe(image(imgPrefs))
+    .pipe(gulp.dest('dev/images/256'))
+    .pipe(gulp.dest('dist/images/256'))
+})
+
+gulp.task('resize512', function() {
+  return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
+    .pipe(changed('dist/images/512'))
+    .pipe(gulpIgnore(lt512))
+    .pipe(imageResize({
+      width : 512
+    }))
+    .pipe(image(imgPrefs))
+    .pipe(gulp.dest('dev/images/512'))
+    .pipe(gulp.dest('dist/images/512'))
+})
+
+gulp.task('resize1024', function() {
+  return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
+    .pipe(changed('dist/images/1024'))
+    .pipe(gulpIgnore(lt1024))
+    .pipe(imageResize({
+      width : 1024
+    }))
+    .pipe(image(imgPrefs))
+    .pipe(gulp.dest('dev/images/1024'))
+    .pipe(gulp.dest('dist/images/1024'))
+})
+
+gulp.task('resize2048', function() {
+  return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
+    .pipe(changed('dist/images/2048'))
+    .pipe(gulpIgnore(lt2048))
+    .pipe(imageResize({
+      width : 2048
+    }))
+    .pipe(image(imgPrefs))
+    .pipe(gulp.dest('dev/images/2048'))
+    .pipe(gulp.dest('dist/images/2048'))
+})
+
+gulp.task('resize', function(callback) {
   runSequence(
-    'less:dev',
-    'sass:dev',
-    'css:dev',
-    'js:dev',
-    'images:dev',
-    'html:dev',
-    'other:dev',
-    'prettify:dev',
+    'resize2048',
+    'resize1024',
+    'resize512',
+    'resize256',
     callback
   )
 })
 
-gulp.task('build:dist', function(callback) {
-  console.log('dist build started...');
+// Build
+
+gulp.task('build', function(callback) {
   runSequence(
-    'less:dist',
-    'sass:dist',
-    'css:dist',
-    'js:dist',
-    'images:dist',
-    'html:dist',
-    'other:dist',
+    'less',
+    'sass',
+    'css',
+    'js',
+    'images',
+    'resize',
+    'html',
+    'other',
+    'prettify:dev',
     callback
   )
 })
@@ -357,28 +376,16 @@ gulp.task('build:dist', function(callback) {
 // Watch
 
 gulp.task('watch', function() {
-    gulp.watch('src/**/*', ['build:dev', 'build:dist']);
+    gulp.watch('src/**/*', ['build'])
 })
 
 // Gulp - Build + Watch + start-servers
 
 gulp.task('default', function(callback) {
   runSequence(
-    'build:dev',
-    'build:dist',
+    'build',
     'watch',
     'server',
     callback
   )
 })
-
-
-/*
-CRON TASK
-git pull -r
-gulp build:dist
-gulp clean:dev (just incase)
-restart nginx
-*/
-
-
