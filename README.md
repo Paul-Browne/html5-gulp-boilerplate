@@ -5,9 +5,7 @@ This is a bit more than a html5 and gulp boilerplate, it also includes setup for
 |feature|check|
 |--|--|
 |express server|:white_check_mark:|
-|gzip|:white_check_mark:|
-|https*|:white_check_mark:|
-|http2*|:white_check_mark:|
+|gzip, https^, http2^|:white_check_mark:|
 |html, css, js minifier|:white_check_mark:|
 |html, css, js prettifier|:white_check_mark:|
 |js uglifier|:white_check_mark:|
@@ -17,7 +15,7 @@ This is a bit more than a html5 and gulp boilerplate, it also includes setup for
 |image resizing|:white_check_mark:|
 |image optimization|:white_check_mark:|
 
-###### https and http2 require setup of https for localhost
+###### ^ https and http2 require setup of https for localhost
 
 for mac users
 `brew install imagemagick`
