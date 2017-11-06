@@ -1,5 +1,5 @@
 var gulp         = require('gulp');
-var sass         = require('gulp-sass');
+var scss         = require('gulp-sass');
 var less         = require('gulp-less');
 var image        = require('gulp-image');
 var uglify       = require('gulp-uglify');
@@ -142,12 +142,12 @@ gulp.task('less', function () {
     .pipe(gulp.dest('dist/css'))
 })
 
-// sass compilation + minification
+// scss compilation + minification
 
-gulp.task('sass', function () {
-  return gulp.src('src/sass/**/*.scss')
+gulp.task('scss', function () {
+  return gulp.src('src/scss/**/*.scss')
     .pipe(changed('dist/css'))
-    .pipe(sass())
+    .pipe(scss())
     .pipe(autoprefixer({
             browsers: ['>1%'],
             cascade: false
@@ -268,33 +268,41 @@ gulp.task('prettify:src', function() {
 
 /* TODO optimize */
 
-var lt256 = function (file) {
+var lt400 = function (file) {
     var dimensions = sizeOf(file.path);
-    if(dimensions.width > 256) {
+    if(dimensions.width > 400) {
         return false;
     }else{
         return true;
     }
 };
-var lt512 = function (file) {
+var lt800 = function (file) {
     var dimensions = sizeOf(file.path);
-    if(dimensions.width > 512) {
+    if(dimensions.width > 800) {
         return false;
     }else{
         return true;
     }
 };
-var lt1024 = function (file) {
+var lt1200 = function (file) {
     var dimensions = sizeOf(file.path);
-    if(dimensions.width > 1024) {
+    if(dimensions.width > 1200) {
         return false;
     }else{
         return true;
     }
 };
-var lt2048 = function (file) {
+var lt1600 = function (file) {
     var dimensions = sizeOf(file.path);
-    if(dimensions.width > 2048) {
+    if(dimensions.width > 1600) {
+        return false;
+    }else{
+        return true;
+    }
+};
+var lt2400 = function (file) {
+    var dimensions = sizeOf(file.path);
+    if(dimensions.width > 2400) {
         return false;
     }else{
         return true;
@@ -302,60 +310,74 @@ var lt2048 = function (file) {
 };
 
 
-gulp.task('resize256', function() {
+
+gulp.task('resize400', function() {
   return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
-    .pipe(changed('dist/images/256'))
-    .pipe(gulpIgnore(lt256))
+    .pipe(changed('dist/images/400'))
+    .pipe(gulpIgnore(lt400))
     .pipe(imageResize({
-      width : 256
+      width : 400
     }))
     .pipe(image(imgPrefs))
-    .pipe(gulp.dest('dev/images/256'))
-    .pipe(gulp.dest('dist/images/256'))
+    .pipe(gulp.dest('dev/images/400'))
+    .pipe(gulp.dest('dist/images/400'))
 })
 
-gulp.task('resize512', function() {
+gulp.task('resize800', function() {
   return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
-    .pipe(changed('dist/images/512'))
-    .pipe(gulpIgnore(lt512))
+    .pipe(changed('dist/images/800'))
+    .pipe(gulpIgnore(lt800))
     .pipe(imageResize({
-      width : 512
+      width : 800
     }))
     .pipe(image(imgPrefs))
-    .pipe(gulp.dest('dev/images/512'))
-    .pipe(gulp.dest('dist/images/512'))
+    .pipe(gulp.dest('dev/images/800'))
+    .pipe(gulp.dest('dist/images/800'))
 })
 
-gulp.task('resize1024', function() {
+gulp.task('resize1200', function() {
   return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
-    .pipe(changed('dist/images/1024'))
-    .pipe(gulpIgnore(lt1024))
+    .pipe(changed('dist/images/1200'))
+    .pipe(gulpIgnore(lt1200))
     .pipe(imageResize({
-      width : 1024
+      width : 1200
     }))
     .pipe(image(imgPrefs))
-    .pipe(gulp.dest('dev/images/1024'))
-    .pipe(gulp.dest('dist/images/1024'))
+    .pipe(gulp.dest('dev/images/1200'))
+    .pipe(gulp.dest('dist/images/1200'))
 })
 
-gulp.task('resize2048', function() {
+gulp.task('resize1600', function() {
   return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
-    .pipe(changed('dist/images/2048'))
-    .pipe(gulpIgnore(lt2048))
+    .pipe(changed('dist/images/1600'))
+    .pipe(gulpIgnore(lt1600))
     .pipe(imageResize({
-      width : 2048
+      width : 1600
     }))
     .pipe(image(imgPrefs))
-    .pipe(gulp.dest('dev/images/2048'))
-    .pipe(gulp.dest('dist/images/2048'))
+    .pipe(gulp.dest('dev/images/1600'))
+    .pipe(gulp.dest('dist/images/1600'))
+})
+
+gulp.task('resize2400', function() {
+  return gulp.src('src/images/**/*.{jpg,jpeg,png,gif}')
+    .pipe(changed('dist/images/2400'))
+    .pipe(gulpIgnore(lt2400))
+    .pipe(imageResize({
+      width : 2400
+    }))
+    .pipe(image(imgPrefs))
+    .pipe(gulp.dest('dev/images/2400'))
+    .pipe(gulp.dest('dist/images/2400'))
 })
 
 gulp.task('resize', function(callback) {
   runSequence(
-    'resize2048',
-    'resize1024',
-    'resize512',
-    'resize256',
+    'resize2400',
+    'resize1600',
+    'resize1200',
+    'resize800',
+    'resize400',
     callback
   )
 })
@@ -365,7 +387,7 @@ gulp.task('resize', function(callback) {
 gulp.task('build', function(callback) {
   runSequence(
     'less',
-    'sass',
+    'scss',
     'css',
     'js',
     'images',
