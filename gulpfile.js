@@ -20,7 +20,6 @@ var http         = require('http');
 var http2        = require('spdy');
 var del          = require('del');
 var opn          = require('opn');
-
 var useref       = require('gulp-useref');
 
 
