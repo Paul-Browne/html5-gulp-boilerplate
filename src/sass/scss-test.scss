@@ -1,19 +1,20 @@
 .alpha {
     font-size: 24px;
-.beta {line-height: 1.5em;
+    .beta {
+        line-height: 1.5em;
         .delta {
-                        color: blue;
+            color: blue;
         }
     }
 }
 
 body {
-                        color: green;
+    color: green;
 }
 
 .example {
-                display: flex;
-                flex-direction: column;
+    display: flex;
+    flex-direction: column;
     transition: all .5s;
     user-select: none;
     background: linear-gradient(to bottom, white, black);

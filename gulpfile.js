@@ -21,6 +21,8 @@ var http2        = require('spdy');
 var del          = require('del');
 var opn          = require('opn');
 
+var useref       = require('gulp-useref');
+
 
 require('dotenv').config();
 
@@ -160,26 +162,15 @@ gulp.task('sass', function () {
 
 gulp.task('css', function() {
   return gulp.src('src/css/**/*.css')
-  .pipe(changed('dist/css'))
-  .pipe(autoprefixer({
+    .pipe(changed('dist/css'))
+    .pipe(autoprefixer({
     browsers: ['>1%'],
     cascade: false
-  }))
-  .pipe(gulp.dest('dev/css'))
-  .pipe(cssnano())
-  .pipe(gulp.dest('dist/css'))
+    }))
+    .pipe(gulp.dest('dev/css'))
+    .pipe(cssnano())
+    .pipe(gulp.dest('dist/css'))
 })
-
-// file combining
-// TODO
-
-//var concat = require('gulp-concat');
-
-// gulp.task('combine', function() {
-//   return gulp.src('dist/css/**/*.css')
-//   .pipe(concat('comb.css'))
-//   .pipe(gulp.dest('dist/css'))
-// })
 
 // js minification + uglification
 
@@ -206,14 +197,28 @@ gulp.task('images', function() {
 gulp.task('html', function() {
   return gulp.src('src/**/*.html')
   .pipe(changed('dist'))
-  .pipe(gulp.dest('dev'))
+  .pipe(gulp.dest('dist'))
   .pipe(htmlmin({
     collapseWhitespace: true,
     removeComments: true,
     minifyCSS: true,
     minifyJS: true
   }))
-  .pipe(gulp.dest('dist'))
+  .pipe(gulp.dest('dev'))
+})
+
+// useref test
+
+gulp.task('combine', function(){
+    return gulp.src('dist/**/*.html')
+    .pipe(useref())
+    .pipe(htmlmin({
+        collapseWhitespace: true,
+        removeComments: true,
+        minifyCSS: true,
+        minifyJS: true
+    }))
+    .pipe(gulp.dest('dist'))
 })
 
 // copy everything else
@@ -248,13 +253,13 @@ gulp.task('clean:code', function() {
 // Prettify css js html
 
 gulp.task('prettify:dev', function() {
-  return gulp.src('dev/**/*.+(html|css|js)')
+  return gulp.src('dev/**/*.+(html|css|js|less|scss)')
     .pipe(prettify())
     .pipe(gulp.dest('dev'))
 })
 
 gulp.task('prettify:src', function() {
-  return gulp.src('src/**/*.+(html|css|js)')
+  return gulp.src('src/**/*.+(html|css|js|less|scss)')
     .pipe(prettify())
     .pipe(gulp.dest('src'))
 })
@@ -367,6 +372,7 @@ gulp.task('build', function(callback) {
     'images',
     'resize',
     'html',
+    'combine',
     'other',
     'prettify:dev',
     callback

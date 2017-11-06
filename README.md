@@ -13,13 +13,15 @@ This is a bit more than a html5 and gulp boilerplate, it also includes setup for
 |js uglifier|:white_check_mark:|
 |css precompilers: sass, less|:white_check_mark:|
 |css autoprefixing: css, sass, less|:white_check_mark:|
-|image optimization|:white_check_mark:|
+|css and js file combining|:white_check_mark:|
 |image resizing|:white_check_mark:|
+|image optimization|:white_check_mark:|
 
 ###### https and http2 require setup of https for localhost
 
 for mac users
 `brew install imagemagick`
+
 `brew install graphicsmagick`
 
 #### to install
@@ -31,15 +33,17 @@ for mac users
 #### delete the /dist and /dev directories
 `npm run clean`
 
-#### delete the /dist and /dev directories (not including images)
-`npm run clean-code`
-
+#### delete the /dist and /dev directories **inc. images**
+`npm run clean-all`
 
 #### prettify contents in the /src directory
 `npm run pretty`
 
-#### to use https://localhost
 
+
+
+
+#### to use https://localhost
 
 for mac users
 ```bash
@@ -52,4 +56,5 @@ $ sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.ke
 If you're seeing any errors related to image packages/libraries it may help to build imagemagick and/or graphicsmagick from source
 
 `brew uninstall imagemagick`
+
 `brew install imagemagick --build-from-source`

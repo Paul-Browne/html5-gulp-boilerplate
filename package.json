@@ -6,9 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "gulp",
-    "clean": "gulp clean",
-    "clean-code": "gulp clean:code",
-    "pretty": "gulp pretty:src"
+    "clean-all": "gulp clean",
+    "clean": "gulp clean:code",
+    "pretty": "gulp prettify:src"
   },
   "repository": {
     "type": "git",
@@ -39,6 +39,7 @@
     "gulp-less": "^3.3.2",
     "gulp-sass": "^3.1.0",
     "gulp-uglify": "^3.0.0",
+    "gulp-useref": "^3.1.3",
     "image-size": "^0.6.1",
     "opn": "^5.1.0",
     "run-sequence": "^2.2.0",
