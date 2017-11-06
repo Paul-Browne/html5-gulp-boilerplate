@@ -223,7 +223,7 @@ gulp.task('combine', function(){
 // copy everything else
 
 gulp.task('other', function() {
-  return gulp.src(['src/**/*.*', '!src/**/*.html', '!src/**/*.css', '!src/**/*.js', '!src/**/*.less', '!src/**/*.scss', '!src/**/*.png', '!src/**/*.jpg', '!src/**/*.jpeg', '!src/**/*.gif', '!src/**/*.svg' ])
+  return gulp.src(['src/**/*.*', '!src/**/*.html', '!src/**/*.css', '!src/**/*.js', '!src/**/*.less', '!src/**/*.scss', '!src/images/*.png', '!src/images/*.jpg', '!src/images/*.jpeg', '!src/images/*.gif', '!src/images/*.svg' ])
   .pipe(changed('dist'))
   .pipe(gulp.dest('dev'))
   .pipe(gulp.dest('dist'))
