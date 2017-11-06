@@ -18,6 +18,7 @@ This is a bit more than a html5 and gulp boilerplate, it also includes setup for
 ###### ^ https and http2 require setup of https for localhost
 
 for mac users
+
 `brew install imagemagick`
 
 `brew install graphicsmagick`
