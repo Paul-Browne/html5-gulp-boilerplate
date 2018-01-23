@@ -57,3 +57,9 @@ If you're seeing any errors related to image packages/libraries it may help to b
 `brew uninstall imagemagick`
 
 `brew install imagemagick --build-from-source`
+
+
+
+##### TODO
+
+add video compression
