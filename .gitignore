@@ -57,7 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
-/dev
-/dist
+dist/
 .DS_Store
-/ignore
+

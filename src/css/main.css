@@ -3,3 +3,8 @@ body {
     font-size: 18px;
     line-height: 1.4;
 }
+
+img {
+    vertical-align: middle;
+    max-width: 100%;
+}

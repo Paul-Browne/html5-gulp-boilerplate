@@ -26,13 +26,16 @@ for mac users
 #### to install
 `npm install`
 
-#### start
+#### build, serve and watch
+`npm run bsw`
+
+#### just build
 `npm run build`
 
-#### delete the /dist and /dev directories
+#### delete the /dist directory
 `npm run clean`
 
-#### delete the /dist and /dev directories **inc. images**
+#### delete the /dist directory **inc. images**
 `npm run clean-all`
 
 #### prettify contents in the /src directory
@@ -58,8 +61,3 @@ If you're seeing any errors related to image packages/libraries it may help to b
 
 `brew install imagemagick --build-from-source`
 
-
-
-##### TODO
-
-add video compression
